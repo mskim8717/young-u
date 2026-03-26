@@ -1,0 +1,13 @@
+node_modules/
+.next/
+.env
+.env.local
+__pycache__/
+*.pyc
+venv/
+.omc/
+dist/
+.vercel/
+.claude/
+.mcp.json
+test-results/
