@@ -122,3 +122,103 @@ JSON 배열로 응답해주세요:
     if start >= 0 and end > start:
         return json.loads(text[start:end])
     return []
+
+
+async def generate_child_summary(
+    child_name: str,
+    child_age: int,
+    notice_content: str,
+    lesson_summary: str,
+) -> dict:
+    """Generate a child-friendly summary of today's learning."""
+    client = get_client()
+
+    context = ""
+    if notice_content:
+        context += f"[알림장]\n{notice_content}\n"
+    if lesson_summary:
+        context += f"[레슨플랜]\n{lesson_summary}\n"
+
+    message = client.messages.create(
+        model="claude-sonnet-4-20250514",
+        max_tokens=1024,
+        messages=[{
+            "role": "user",
+            "content": f"""당신은 만 {child_age}세 유치원생 '{child_name}'의 다정한 학습 친구입니다.
+
+다음 자료를 바탕으로 아이가 직접 읽을 수 있는 오늘의 학습 요약을 만들어주세요.
+
+규칙:
+- 모든 문장은 8단어 이내로 짧게
+- 이모지를 많이 사용해주세요
+- 아이에게 말하듯 다정하고 재미있는 톤
+- {child_name}의 이름을 사용해주세요
+- 3~5문장으로 요약
+
+자료:
+{context}
+
+JSON으로 응답:
+{{"summary": "아이용 학습 요약...", "encouragement": "격려 메시지 한 줄"}}"""
+        }],
+    )
+
+    import json
+    text = message.content[0].text
+    start = text.find("{")
+    end = text.rfind("}") + 1
+    if start >= 0 and end > start:
+        return json.loads(text[start:end])
+    return {"summary": "오늘도 재미있게 배웠어요! 🌟", "encouragement": "최고야! ⭐"}
+
+
+async def generate_learning_activities(
+    child_name: str,
+    child_age: int,
+    review_summary: str,
+) -> list[dict]:
+    """Generate diverse learning activities for child review."""
+    client = get_client()
+
+    message = client.messages.create(
+        model="claude-sonnet-4-20250514",
+        max_tokens=3000,
+        messages=[{
+            "role": "user",
+            "content": f"""당신은 만 {child_age}세 유치원생 '{child_name}'의 재미있는 학습 친구입니다.
+
+규칙:
+- 모든 문장은 8단어 이내로 짧게
+- 어려운 단어 대신 아이가 아는 쉬운 단어만 사용
+- 각 질문에 관련 이모지를 반드시 포함
+- 정답이 명확하고 혼동 없어야 함
+- 오답 보기도 아이 수준에 맞게
+- 힌트를 하나씩 제공
+- 격려하는 재미있는 톤
+
+다음 내용을 바탕으로 학습 활동을 만들어주세요:
+{review_summary}
+
+JSON 배열로 다음 활동들을 만들어주세요:
+
+1. OX퀴즈 3개: activity_type="ox", options=["⭕ 맞아요", "❌ 틀려요"], answer는 "⭕ 맞아요" 또는 "❌ 틀려요"
+2. 4지선다 퀴즈 3개: activity_type="multiple_choice", options에 이모지 포함 보기 4개
+3. 빈칸 채우기 2개: activity_type="fill_blank", question에 ___포함, options에 보기 3개
+4. 플래시카드 3개: activity_type="flashcard", question=이모지+질문, answer=답+짧은설명
+5. 단어 연결 1개: activity_type="word_match", options에 {{"words":["단어1","단어2","단어3"], "descriptions":["설명1","설명2","설명3"]}} 형태
+
+각 항목 형식:
+[
+  {{"activity_type": "ox", "question": "🌸 봄에 꽃이 피어요", "answer": "⭕ 맞아요", "options": ["⭕ 맞아요", "❌ 틀려요"], "hint": "봄이 되면 예쁜 꽃이...", "emoji_cue": "🌸"}},
+  ...
+]"""
+        }],
+    )
+
+    import json
+    text = message.content[0].text
+    start = text.find("[")
+    end = text.rfind("]") + 1
+    if start >= 0 and end > start:
+        return json.loads(text[start:end])
+    return []

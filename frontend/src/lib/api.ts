@@ -57,6 +57,18 @@ export const api = {
   getQuizzes: (reviewId: string) => request<Quiz[]>(`/api/quizzes?review_id=${reviewId}`),
   generateQuizzes: (reviewId: string) =>
     request<Quiz[]>(`/api/quizzes/generate`, { method: "POST", body: JSON.stringify({ review_id: reviewId }) }),
+
+  // Learning
+  getTodaySession: (childId: string) =>
+    request<LearningSession>(`/api/learning/today/${childId}`),
+  getChildSummary: (childId: string, date: string) =>
+    request<ChildSummary>(`/api/learning/summary/${childId}/${date}`),
+  completeActivity: (activityId: string, isCorrect: boolean) =>
+    request<{ completed: number; total: number; stars: number }>(`/api/learning/complete`, {
+      method: "POST", body: JSON.stringify({ activity_id: activityId, is_correct: isCorrect }),
+    }),
+  getLearningStats: (childId: string) =>
+    request<LearningStats>(`/api/learning/stats/${childId}`),
 };
 
 // Types
@@ -126,4 +138,41 @@ export interface Quiz {
   options?: string[];
   quiz_type: "quiz" | "flashcard";
   created_at: string;
+}
+
+export interface LearningSession {
+  id: string;
+  child_id: string;
+  date: string;
+  stars_earned: number;
+  activities_completed: number;
+  total_activities: number;
+  completed_at: string | null;
+  activities: LearningActivity[];
+}
+
+export interface LearningActivity {
+  id: string;
+  session_id: string;
+  activity_type: "ox" | "multiple_choice" | "fill_blank" | "flashcard" | "word_match";
+  question: string;
+  answer: string;
+  options?: any;
+  hint?: string;
+  emoji_cue?: string;
+  is_completed: boolean;
+  is_correct?: boolean;
+  display_order: number;
+}
+
+export interface ChildSummary {
+  summary: string;
+  encouragement: string;
+}
+
+export interface LearningStats {
+  current_streak: number;
+  longest_streak: number;
+  total_stars: number;
+  last_activity_date: string | null;
 }

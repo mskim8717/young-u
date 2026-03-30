@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.config import settings
-from app.routers import children, textbooks, lesson_plans, daily_notices, reviews, quizzes
+from app.routers import children, textbooks, lesson_plans, daily_notices, reviews, quizzes, learning
 
 app = FastAPI(title="Young-U API", version="0.1.0")
 
@@ -19,6 +19,7 @@ app.include_router(lesson_plans.router, prefix="/api/lesson-plans", tags=["lesso
 app.include_router(daily_notices.router, prefix="/api/daily-notices", tags=["daily-notices"])
 app.include_router(reviews.router, prefix="/api/reviews", tags=["reviews"])
 app.include_router(quizzes.router, prefix="/api/quizzes", tags=["quizzes"])
+app.include_router(learning.router, prefix="/api/learning", tags=["learning"])
 
 
 @app.get("/api/health")

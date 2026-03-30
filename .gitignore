@@ -11,3 +11,5 @@ dist/
 .claude/
 .mcp.json
 test-results/
+.DS_Store
+docs/

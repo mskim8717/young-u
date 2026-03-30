@@ -11,6 +11,7 @@ const links = [
   { href: "/lesson-plans", label: "레슨플랜", icon: "📅" },
   { href: "/review", label: "데일리 리뷰", icon: "✏️" },
   { href: "/quiz", label: "퀴즈", icon: "🎯" },
+  { href: "/learn", label: "학습모드", icon: "🎮" },
 ];
 
 export function Nav() {
